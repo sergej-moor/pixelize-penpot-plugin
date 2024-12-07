@@ -2,10 +2,31 @@
   import Controls from './components/Controls.svelte';
   import Preview from './components/Preview.svelte';
   import { theme, updateTheme } from './stores/theme';
+  import { 
+    selection, 
+    updateSelection, 
+    updateExportedImage,
+    setUploadingFill 
+  } from './stores/selection';
   
   const handleMessage = (event: MessageEvent) => {
-    if (event.data.type === 'theme') {
-      updateTheme(event.data.content);
+    switch (event.data.type) {
+      case 'theme':
+        updateTheme(event.data.content);
+        break;
+      case 'selection':
+        updateSelection(event.data.content);
+        break;
+      case 'selection-loaded':
+        updateExportedImage(
+          event.data.imageData,
+          event.data.width,
+          event.data.height
+        );
+        break;
+      case 'fill-upload-complete':
+        setUploadingFill(false);
+        break;
     }
   }
 </script>
