@@ -14,6 +14,7 @@ export type PluginMessageEvent =
       fillIndex?: number;
       originalFill: any;
       shouldDeleteFirst: boolean;
+      addNewLayer: boolean;
     }
   | { type: "fill-upload-complete" };
 // Add more message types here

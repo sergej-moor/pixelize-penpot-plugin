@@ -10,26 +10,35 @@
     displayValue = parseInt(input.value);
   }
 
-  // Only process the image when the slider is released
+  // Update stored value without processing
   function handleChange(event: Event) {
     const input = event.target as HTMLInputElement;
     const pixelSize = parseInt(input.value);
     currentValue = pixelSize;
     displayValue = pixelSize;
-    pixelateImage(pixelSize);
+    // Update the store's pixelSize without processing
+    selection.update(state => ({ ...state, pixelSize }));
   }
 
-  // Update currentValue and displayValue when store changes and not loading
-  $: if (!$selection.isPixelizing && !$selection.isUploadingFill) {
+  function handleApplyEffect() {
+    pixelateImage(currentValue, false);
+  }
+
+  function handleAddNewLayer() {
+    pixelateImage(currentValue, true);
+  }
+
+  // Only update values from store when processing state changes
+  $: if ($selection.isPixelizing || $selection.isUploadingFill) {
     currentValue = $selection.pixelSize;
     displayValue = currentValue;
   }
 
-  // Check if slider should be disabled
+  // Check if buttons should be disabled
   $: isDisabled = !$selection.exportedImage || $selection.isPixelizing || $selection.isUploadingFill;
 </script>
 
-<div class="">
+<div class="flex flex-col gap-4">
   <label class="slider-row">
     <span class="body-s">Pixel Size:</span>
     <div class="flex items-center gap-2">
@@ -44,15 +53,27 @@
           class="w-full {isDisabled ? 'opacity-50' : ''}"
           disabled={isDisabled}
         />
-        {#if isDisabled}
-          <div class="absolute inset-0 flex items-center justify-center text-sm text-gray-500">
-            Loading image...
-          </div>
-        {/if}
       </div>
       <span class="text-sm w-8 text-right">{displayValue}</span>
     </div>
   </label>
+
+  <div class="flex gap-2">
+    <button 
+      on:click={handleApplyEffect}
+      disabled={isDisabled}
+      class="flex-1 bg-blue-500 text-white rounded px-4 py-2 disabled:opacity-50"
+    >
+      Apply Effect
+    </button>
+    <button 
+      on:click={handleAddNewLayer}
+      disabled={isDisabled}
+      class="flex-1 bg-green-500 text-white rounded px-4 py-2 disabled:opacity-50"
+    >
+      Add New Layer
+    </button>
+  </div>
 </div>
 
 <style>

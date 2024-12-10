@@ -32,7 +32,7 @@ export function updateSelection(shapes: any) {
   }));
 }
 
-export async function pixelateImage(pixelSize: number) {
+export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
   try {
     const state = get(selection);
     if (!state.exportedImage || !state.fills?.length) return;
@@ -54,7 +54,8 @@ export async function pixelateImage(pixelSize: number) {
       imageData: Array.from(processed.data),
       fillIndex: 0,
       originalFill: state.fills[state.fills.length - 1],
-      shouldDeleteFirst: state.fills.length >= 2,
+      shouldDeleteFirst: !addNewLayer && state.fills.length >= 2,
+      addNewLayer,
     };
     window.parent.postMessage(message, "*");
 
@@ -64,7 +65,8 @@ export async function pixelateImage(pixelSize: number) {
       pixelSize,
       isPixelizing: false,
       exportedImage: {
-        ...state.exportedImage,
+        width: state.exportedImage!.width,
+        height: state.exportedImage!.height,
         data: Array.from(processed.data),
       },
     }));

@@ -34,24 +34,25 @@
           class="w-full h-auto rounded"
           style="width: {$selection.exportedImage.width}px; height: {$selection.exportedImage.height}px; object-fit: contain;"
         />
+        {#if $selection.isPixelizing || $selection.isUploadingFill}
+          <div class="loading-overlay absolute inset-0 flex items-center justify-center bg-black/50 rounded">
+            <p class="text-sm text-white font-medium">
+              {#if $selection.isPixelizing}
+                Pixelizing image...
+              {:else}
+                Uploading fill...
+              {/if}
+            </p>
+          </div>
+        {/if}
       </div>
     {:else}
       <div class="empty-state flex items-center justify-center p-8 bg-gray-100 dark:bg-gray-800 rounded">
         <p class="text-sm text-gray-600 dark:text-gray-400">
-          Select an image to begin
-        </p>
-      </div>
-    {/if}
-
-    {#if $selection.isLoading || $selection.isPixelizing || $selection.isUploadingFill}
-      <div class="loading-overlay absolute inset-0 flex items-center justify-center bg-black/50 rounded">
-        <p class="text-sm text-white font-medium">
-          {#if $selection.isLoading}
+          {#if $selection.name }
             Loading image...
-          {:else if $selection.isPixelizing}
-            Pixelizing image...
           {:else}
-            Uploading fill...
+            Select an image to begin
           {/if}
         </p>
       </div>
@@ -66,17 +67,22 @@
 
   .preview-content {
     min-height: 100px;
+    width: 300px;
+    height: 300px;
   }
 
   .image-preview {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
   }
 
   img {
     max-width: 100%;
     max-height: 300px;
+    width: 300px;
+    height: 300px;
   }
 
   .loading-overlay {
