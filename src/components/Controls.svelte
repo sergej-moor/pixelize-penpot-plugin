@@ -8,6 +8,7 @@
   let displayValue = currentValue;
   let lastSelectionId = $selection.id;
   let realtimePreview = false;
+  let previousRealtimeState = false;
 
   // Just update the display value during dragging
   function handleInput(event: Event) {
@@ -32,8 +33,14 @@
   }
 
   // Watch for changes to realtimePreview
-  $: if (realtimePreview) {
-    handleApplyEffect();
+  $: if (realtimePreview !== previousRealtimeState) {
+    if (realtimePreview) {
+      handleApplyEffect();
+    } else if ($selection.fills && $selection.fills.length > 1) {
+      // When realtime is turned off and we have multiple fills
+      handleDeleteTopLayer();
+    }
+    previousRealtimeState = realtimePreview;
   }
 
   function handleApplyEffect() {
@@ -42,6 +49,18 @@
 
   function handleAddNewLayer() {
     pixelateImage(currentValue, true);
+  }
+
+  function handleClearAllExceptLast() {
+    window.parent.postMessage({
+      type: "clear-all-except-last",
+    }, "*");
+  }
+
+  function handleDeleteTopLayer() {
+    window.parent.postMessage({
+      type: "delete-top-layer",
+    }, "*");
   }
 
   // Only update values when selection changes (new image selected)
@@ -55,6 +74,9 @@
   $: isDisabled = !$selection.exportedImage;
   $: isProcessing = $selection.isPixelizing || $selection.isUploadingFill || $selection.isPreviewLoading;
   $: shouldDisableApply = isDisabled || isProcessing || realtimePreview;
+
+  // Add this reactive variable to check if we have multiple fills
+  $: hasMultipleFills = $selection.fills && $selection.fills.length > 1;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -107,9 +129,9 @@
       on:click={handleAddNewLayer}
       disabled={isDisabled || isProcessing}
       data-appearance="primary"
-      class="flex-1  flex justify-center gap-2 items-center"
+      class="flex-1 flex justify-center gap-2 items-center"
     >
-Create new Shape
+      Create new Shape
     </button>
   </div>
 </div>

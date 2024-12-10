@@ -7,7 +7,8 @@ export type PluginMessage =
       type: "update-image-fill";
       imageData: ImageData & { addNewLayer: boolean };
     }
-  | { type: "fill-upload-complete" };
+  | { type: "fill-upload-complete" }
+  | { type: "delete-top-layer" };
 // Add more message types here
 
 export interface ImageData {

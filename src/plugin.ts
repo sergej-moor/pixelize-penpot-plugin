@@ -116,6 +116,42 @@ penpot.ui.onMessage(async (message: PluginMessage) => {
     } catch (error) {
       console.error("Error updating image fill:", error);
     }
+  } else if (message.type === "delete-top-layer") {
+    const selection = penpot.selection[0];
+    if (
+      !selection ||
+      !Array.isArray(selection.fills) ||
+      selection.fills.length <= 1
+    )
+      return;
+
+    const blockId = penpot.history.undoBlockBegin();
+    try {
+      // Remove the first fill by creating a new array without it
+      selection.fills = selection.fills.slice(1);
+    } finally {
+      penpot.history.undoBlockFinish(blockId);
+    }
+  } else if (message.type === "clear-all-except-last") {
+    const selection = penpot.selection[0];
+    if (
+      !selection ||
+      !Array.isArray(selection.fills) ||
+      selection.fills.length <= 1
+    )
+      return;
+
+    const blockId = penpot.history.undoBlockBegin();
+    try {
+      // Keep only the last fill
+      const lastFill = selection.fills[selection.fills.length - 1];
+      selection.fills = [lastFill];
+
+      // Notify Penpot about the change
+      penpot.notify();
+    } finally {
+      penpot.history.undoBlockFinish(blockId);
+    }
   }
 });
 
