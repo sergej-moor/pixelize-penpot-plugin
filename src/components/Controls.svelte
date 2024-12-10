@@ -7,6 +7,7 @@
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
   let lastSelectionId = $selection.id;
+  let realtimePreview = false;
 
   // Just update the display value during dragging
   function handleInput(event: Event) {
@@ -20,8 +21,14 @@
     const pixelSize = parseInt(input.value);
     currentValue = pixelSize;
     displayValue = pixelSize;
-    // Update the store's pixelSize and preview
+    
+    // Update the preview
     updatePreview(pixelSize);
+
+    // If realtime preview is enabled, apply the effect immediately
+    if (realtimePreview) {
+      handleApplyEffect();
+    }
   }
 
   function handleApplyEffect() {
@@ -42,9 +49,24 @@
   // Check if controls should be disabled
   $: isDisabled = !$selection.exportedImage;
   $: isProcessing = $selection.isPixelizing || $selection.isUploadingFill || $selection.isPreviewLoading;
+  $: shouldDisableApply = isDisabled || isProcessing || realtimePreview;
 </script>
 
 <div class="flex flex-col gap-4">
+  <div class="checkbox-container flex items-center justify-end gap-2">
+    <label for="realtimePreview" class=" text-sm">
+      Realtime
+    </label>
+    <input
+      id="realtimePreview"
+      type="checkbox"
+      bind:checked={realtimePreview}
+      disabled={isDisabled || isProcessing}
+      class="checkbox-input"
+    />
+   
+  </div>
+
   <label class="slider-row">
     <span class="body-s">Pixel Size:</span>
     <div class="flex items-center gap-2">
@@ -64,14 +86,17 @@
     </div>
   </label>
 
+
+
   <div class="flex flex-col gap-2">
     <button 
       on:click={handleApplyEffect}
       data-appearance="primary"
-      disabled={isDisabled || isProcessing}
-       class="flex-1  flex justify-center gap-2 items-center"
+      disabled={shouldDisableApply}
+      class:opacity-50={realtimePreview}
+      class="flex-1 flex justify-center gap-2 items-center"
     >
-   Apply to shape
+      {realtimePreview ? 'Auto-applying changes' : 'Apply to shape'}
     </button>
     <button 
       on:click={handleAddNewLayer}
@@ -83,3 +108,4 @@ Create new Shape
     </button>
   </div>
 </div>
+

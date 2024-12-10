@@ -15,7 +15,7 @@
 
 <main data-theme={$theme}>
   <div class="flex flex-col gap-4">
-    <h1 class="text-xl font-bold">Pixelize!</h1>
+
     
     <!-- Wrap Preview with its own error boundary -->
     <ErrorBoundary 

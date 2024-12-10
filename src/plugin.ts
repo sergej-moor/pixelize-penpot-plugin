@@ -3,8 +3,8 @@ import type { Fill } from "@penpot/plugin-types";
 
 const PLUGIN_CONFIG = {
   name: "Pixelize",
-  width: 408,
-  height: 612,
+  width: 340,
+  height: 662,
 } as const;
 
 // Initialize plugin
