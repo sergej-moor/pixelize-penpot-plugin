@@ -108,11 +108,13 @@ penpot.on("selectionchange", async () => {
     // Set loading state immediately
     sendMessage({ type: "selection-loading", isLoading: true });
 
+    const selectionId = Math.random().toString(36).substring(2);
+
     // First send the initial selection with name and ID
     sendMessage({
       type: "selection",
       content: {
-        id: selection.id,
+        id: selectionId,
         name: selection.name,
         fills: selection.fills,
       },
@@ -125,12 +127,13 @@ penpot.on("selectionchange", async () => {
         scale: 2,
       });
 
-      // Send the exported image data
+      // Send the exported image data with the selection ID
       sendMessage({
         type: "selection-loaded",
         imageData: Array.from(imageData),
         width: selection.width,
         height: selection.height,
+        selectionId,
       });
     } else {
       // Clear loading state if no fills

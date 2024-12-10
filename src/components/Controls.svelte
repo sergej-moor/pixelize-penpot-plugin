@@ -28,8 +28,8 @@
     pixelateImage(currentValue, true);
   }
 
-  // Only update values from store when processing state changes
-  $: if ($selection.isPixelizing || $selection.isUploadingFill) {
+  // Only update values from store when processing state changes or selection changes
+  $: {
     currentValue = $selection.pixelSize;
     displayValue = currentValue;
   }

@@ -25,7 +25,8 @@
         updateExportedImage(
           event.data.imageData,
           event.data.width,
-          event.data.height
+          event.data.height,
+          event.data.selectionId
         );
         break;
       case 'fill-upload-complete':

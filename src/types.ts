@@ -6,6 +6,7 @@ export type PluginMessageEvent =
       imageData: number[];
       width: number;
       height: number;
+      selectionId: string;
     }
   | { type: "selection-loading"; isLoading: boolean }
   | {

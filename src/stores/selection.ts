@@ -25,6 +25,7 @@ interface SelectionState {
   pixelSize: number;
   isLoading: boolean;
   isPreviewLoading: boolean;
+  id?: string;
 }
 
 const initialState: SelectionState = {
@@ -33,20 +34,38 @@ const initialState: SelectionState = {
   pixelSize: 1,
   isLoading: false,
   isPreviewLoading: false,
+  id: undefined,
 };
 
 export const selection = writable<SelectionState>(initialState);
 
 export function updateSelection(shapes: any) {
+  // If no shapes or shapes is null, reset to initial state
+  if (!shapes) {
+    selection.set(initialState);
+    return;
+  }
+
+  // Generate a new ID for this selection
+  const newId = shapes.id || Math.random().toString(36).substring(2);
+
+  // Reset all image and processing states, but keep the new selection info
   selection.update(() => ({
     ...initialState,
-    ...shapes,
+    id: newId,
+    name: shapes.name,
+    fills: shapes.fills,
+    // Clear all image data
+    originalImage: undefined,
+    exportedImage: undefined,
+    previewData: undefined,
   }));
 }
 
 export async function updatePreview(pixelSize: number) {
   const state = get(selection);
-  if (!state.originalImage) return;
+  if (!state.originalImage || !state.name || !state.fills || !state.id) return;
+  const currentId = state.id;
 
   try {
     selection.update((state) => ({ ...state, isPreviewLoading: true }));
@@ -57,6 +76,16 @@ export async function updatePreview(pixelSize: number) {
       state.originalImage.height,
       pixelSize
     );
+
+    // Check if we still have the same selection
+    const currentState = get(selection);
+    if (
+      !currentState.name ||
+      !currentState.fills ||
+      currentState.id !== currentId
+    ) {
+      return;
+    }
 
     selection.update((state) => ({
       ...state,
@@ -75,10 +104,10 @@ export async function updatePreview(pixelSize: number) {
 }
 
 export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
-  try {
-    const state = get(selection);
-    if (!state.originalImage || !state.fills?.length) return;
+  const state = get(selection);
+  if (!state.originalImage || !state.fills?.length || !state.name) return;
 
+  try {
     selection.update((state) => ({ ...state, isPixelizing: true }));
 
     const processed = await processImage(
@@ -87,6 +116,12 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
       state.originalImage.height,
       pixelSize
     );
+
+    // Check if we still have a selection before continuing
+    const currentState = get(selection);
+    if (!currentState.name || !currentState.fills) {
+      return;
+    }
 
     selection.update((state) => ({ ...state, isUploadingFill: true }));
 
@@ -121,34 +156,54 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
 export function updateExportedImage(
   imageData: number[],
   width: number,
-  height: number
+  height: number,
+  selectionId: string
 ) {
-  selection.update((state) => ({
-    ...state,
-    isLoading: false,
-    originalImage: {
-      data: imageData,
-      width,
-      height,
-    },
-    exportedImage: {
-      data: imageData,
-      width,
-      height,
-    },
-  }));
+  selection.update((state) => {
+    // Only update if we still have the same selection
+    if (!state.name || !state.fills || state.id !== selectionId) {
+      return state;
+    }
+
+    return {
+      ...state,
+      isLoading: false,
+      originalImage: {
+        data: imageData,
+        width,
+        height,
+      },
+      exportedImage: {
+        data: imageData,
+        width,
+        height,
+      },
+    };
+  });
 }
 
 export function setUploadingFill(isUploading: boolean) {
-  selection.update((state) => ({
-    ...state,
-    isUploadingFill: isUploading,
-  }));
+  selection.update((state) => {
+    // Only update if we still have a selection
+    if (!state.name || !state.fills) {
+      return initialState;
+    }
+    return {
+      ...state,
+      isUploadingFill: isUploading,
+    };
+  });
 }
 
 export function setLoading(isLoading: boolean) {
-  selection.update((state) => ({
-    ...state,
-    isLoading,
-  }));
+  selection.update((state) => {
+    // If setting to false and we don't have a selection, reset to initial state
+    if (!isLoading && (!state.name || !state.fills)) {
+      return initialState;
+    }
+    return {
+      ...state,
+      isLoading,
+    };
+  });
 }
