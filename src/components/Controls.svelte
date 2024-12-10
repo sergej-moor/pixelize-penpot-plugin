@@ -31,6 +31,11 @@
     }
   }
 
+  // Watch for changes to realtimePreview
+  $: if (realtimePreview) {
+    handleApplyEffect();
+  }
+
   function handleApplyEffect() {
     pixelateImage(currentValue, false);
   }
