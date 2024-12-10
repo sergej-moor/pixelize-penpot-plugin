@@ -168,27 +168,37 @@ export function updateExportedImage(
   height: number,
   selectionId: string
 ) {
-  selection.update((state) => {
-    // Only update if we still have the same selection
-    if (!state.name || !state.fills || state.id !== selectionId) {
-      return state;
-    }
+  try {
+    selection.update((state) => {
+      // Only update if we still have the same selection
+      if (!state.name || !state.fills || state.id !== selectionId) {
+        return state;
+      }
 
-    return {
+      return {
+        ...state,
+        isLoading: false,
+        originalImage: {
+          data: imageData,
+          width,
+          height,
+        },
+        exportedImage: {
+          data: imageData,
+          width,
+          height,
+        },
+      };
+    });
+  } catch (error) {
+    console.error("Failed to update exported image:", error);
+    selection.update((state) => ({
       ...state,
       isLoading: false,
-      originalImage: {
-        data: imageData,
-        width,
-        height,
-      },
-      exportedImage: {
-        data: imageData,
-        width,
-        height,
-      },
-    };
-  });
+      error:
+        "Failed to process image. Please try again with a different selection.",
+    }));
+  }
 }
 
 export function setUploadingFill(isUploading: boolean) {
