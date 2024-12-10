@@ -30,7 +30,7 @@
   });
 </script>
 
-<h3 class="font-bold text-sm ">Selection: {$selection.name || 'No selection'}</h3>
+<h3 class="font-bold text-sm ">Selection: {$selection.name ? ($selection.name.length > 28 ? $selection.name.slice(0, 25) + '...' : $selection.name) : 'No selection'}</h3>
 
 <div class="rounded-lg border border-gray-200 dark:border-gray-700">
   <div class="relative w-[300px] h-[300px] min-h-[100px]">

@@ -42,7 +42,7 @@
   
   
   <div class="flex flex-col gap-2">
-   <h2 class="text-center">Pixelize</h2>
+   <h2 >Pixelize!</h2>
   <Preview></Preview>
   <Controls></Controls>
   </div>
