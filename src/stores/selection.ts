@@ -5,6 +5,11 @@ import { processImage } from "../utils/imageProcessing";
 interface SelectionState {
   fills?: any[];
   name?: string;
+  originalImage?: {
+    data: number[];
+    width: number;
+    height: number;
+  };
   exportedImage?: {
     data: number[];
     width: number;
@@ -41,15 +46,15 @@ export function updateSelection(shapes: any) {
 
 export async function updatePreview(pixelSize: number) {
   const state = get(selection);
-  if (!state.exportedImage) return;
+  if (!state.originalImage) return;
 
   try {
     selection.update((state) => ({ ...state, isPreviewLoading: true }));
 
     const processed = await processImage(
-      new Uint8Array(state.exportedImage.data),
-      state.exportedImage.width,
-      state.exportedImage.height,
+      new Uint8Array(state.originalImage.data),
+      state.originalImage.width,
+      state.originalImage.height,
       pixelSize
     );
 
@@ -58,8 +63,8 @@ export async function updatePreview(pixelSize: number) {
       pixelSize,
       isPreviewLoading: false,
       previewData: {
-        width: state.exportedImage!.width,
-        height: state.exportedImage!.height,
+        width: state.originalImage!.width,
+        height: state.originalImage!.height,
         data: Array.from(processed.data),
       },
     }));
@@ -72,14 +77,14 @@ export async function updatePreview(pixelSize: number) {
 export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
   try {
     const state = get(selection);
-    if (!state.exportedImage || !state.fills?.length) return;
+    if (!state.originalImage || !state.fills?.length) return;
 
     selection.update((state) => ({ ...state, isPixelizing: true }));
 
     const processed = await processImage(
-      new Uint8Array(state.exportedImage.data),
-      state.exportedImage.width,
-      state.exportedImage.height,
+      new Uint8Array(state.originalImage.data),
+      state.originalImage.width,
+      state.originalImage.height,
       pixelSize
     );
 
@@ -96,14 +101,14 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
     };
     window.parent.postMessage(message, "*");
 
-    // Update the preview immediately with the processed image
+    // Update the preview with the processed image
     selection.update((state) => ({
       ...state,
       pixelSize,
       isPixelizing: false,
       exportedImage: {
-        width: state.exportedImage!.width,
-        height: state.exportedImage!.height,
+        width: state.originalImage!.width,
+        height: state.originalImage!.height,
         data: Array.from(processed.data),
       },
     }));
@@ -121,6 +126,11 @@ export function updateExportedImage(
   selection.update((state) => ({
     ...state,
     isLoading: false,
+    originalImage: {
+      data: imageData,
+      width,
+      height,
+    },
     exportedImage: {
       data: imageData,
       width,
