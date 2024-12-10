@@ -3,30 +3,21 @@
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
-  let previewTimeout: number;
 
-  // Update preview while dragging
+  // Just update the display value during dragging
   function handleInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    const pixelSize = parseInt(input.value);
-    displayValue = pixelSize;
-    
-    // Clear previous timeout
-    clearTimeout(previewTimeout);
-    // Set new timeout
-    previewTimeout = setTimeout(() => {
-      updatePreview(pixelSize);
-    }, 100);
+    displayValue = parseInt(input.value);
   }
 
-  // Update stored value without processing
+  // Update preview when slider is released
   function handleChange(event: Event) {
     const input = event.target as HTMLInputElement;
     const pixelSize = parseInt(input.value);
     currentValue = pixelSize;
     displayValue = pixelSize;
-    // Update the store's pixelSize without processing
-    selection.update(state => ({ ...state, pixelSize }));
+    // Update the store's pixelSize and preview
+    updatePreview(pixelSize);
   }
 
   function handleApplyEffect() {
