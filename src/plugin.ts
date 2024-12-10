@@ -69,6 +69,9 @@ penpot.on("selectionchange", async () => {
   }
 
   try {
+    // Set loading state immediately
+    sendMessage({ type: "selection-loading", isLoading: true });
+
     // First send the initial selection with name and ID
     sendMessage({
       type: "selection",
@@ -79,21 +82,28 @@ penpot.on("selectionchange", async () => {
       },
     });
 
-    // Export the image from the shape
-    const imageData = await selection.export({
-      type: "png",
-      scale: 2,
-    });
+    if (Array.isArray(selection.fills)) {
+      // Export the image from the shape
+      const imageData = await selection.export({
+        type: "png",
+        scale: 2,
+      });
 
-    // Send the exported image data
-    sendMessage({
-      type: "selection-loaded",
-      imageData: Array.from(imageData),
-      width: selection.width,
-      height: selection.height,
-    });
+      // Send the exported image data
+      sendMessage({
+        type: "selection-loaded",
+        imageData: Array.from(imageData),
+        width: selection.width,
+        height: selection.height,
+      });
+    } else {
+      // Clear loading state if no fills
+      sendMessage({ type: "selection-loading", isLoading: false });
+    }
   } catch (error) {
     console.error("Error exporting selection:", error);
+    // Clear loading state on error
+    sendMessage({ type: "selection-loading", isLoading: false });
   }
 });
 

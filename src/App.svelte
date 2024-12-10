@@ -6,7 +6,8 @@
     selection, 
     updateSelection, 
     updateExportedImage,
-    setUploadingFill 
+    setUploadingFill,
+    setLoading
   } from './stores/selection';
   
   const handleMessage = (event: MessageEvent) => {
@@ -16,6 +17,9 @@
         break;
       case 'selection':
         updateSelection(event.data.content);
+        break;
+      case 'selection-loading':
+        setLoading(event.data.isLoading);
         break;
       case 'selection-loaded':
         updateExportedImage(

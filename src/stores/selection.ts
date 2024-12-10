@@ -13,12 +13,14 @@ interface SelectionState {
   isUploadingFill: boolean;
   isPixelizing: boolean;
   pixelSize: number;
+  isLoading: boolean;
 }
 
 const initialState: SelectionState = {
   isUploadingFill: false,
   isPixelizing: false,
   pixelSize: 1,
+  isLoading: false,
 };
 
 export const selection = writable<SelectionState>(initialState);
@@ -46,22 +48,25 @@ export async function pixelateImage(pixelSize: number) {
 
     selection.update((state) => ({ ...state, isUploadingFill: true }));
 
-    // Always get the last fill (original image) as the basis for pixelization
-    const originalFill = state.fills[state.fills.length - 1];
-
+    // Send the processed image to be uploaded
     const message = {
       type: "update-image-fill" as const,
       imageData: Array.from(processed.data),
       fillIndex: 0,
-      originalFill,
+      originalFill: state.fills[state.fills.length - 1],
       shouldDeleteFirst: state.fills.length >= 2,
     };
     window.parent.postMessage(message, "*");
 
+    // Update the preview immediately with the processed image
     selection.update((state) => ({
       ...state,
       pixelSize,
       isPixelizing: false,
+      exportedImage: {
+        ...state.exportedImage,
+        data: Array.from(processed.data),
+      },
     }));
   } catch (error) {
     console.error("Failed to pixelate image:", error);
@@ -76,6 +81,7 @@ export function updateExportedImage(
 ) {
   selection.update((state) => ({
     ...state,
+    isLoading: false,
     exportedImage: {
       data: imageData,
       width,
@@ -88,5 +94,12 @@ export function setUploadingFill(isUploading: boolean) {
   selection.update((state) => ({
     ...state,
     isUploadingFill: isUploading,
+  }));
+}
+
+export function setLoading(isLoading: boolean) {
+  selection.update((state) => ({
+    ...state,
+    isLoading,
   }));
 }
