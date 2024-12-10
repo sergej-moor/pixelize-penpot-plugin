@@ -1,5 +1,5 @@
 <div class="flex justify-center items-center w-full p-4">
-  <div class="animate-spin rounded-full h-6 w-6">
+  <div class="animate-[spin_1.5s_ease-in-out_infinite] rounded-full h-6 w-6">
     <svg 
       xmlns="http://www.w3.org/2000/svg" 
       width="24" 

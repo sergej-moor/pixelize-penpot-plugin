@@ -10,6 +10,6 @@ export const LOADING_MESSAGES = {
   PREVIEW: "Updating preview...",
   PIXELIZING: "Pixelizing image...",
   UPLOADING: "Uploading fill...",
-  INITIAL: "Loading image...",
-  NO_SELECTION: "Select an image to begin",
+  INITIAL: "Loading selection...",
+  NO_SELECTION: "Select something to begin",
 } as const;
