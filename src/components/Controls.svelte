@@ -1,8 +1,10 @@
 <script lang="ts">
   import { selection, pixelateImage, updatePreview } from '../stores/selection';
+  import { CONSTANTS } from '../constants';
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
+  let lastSelectionId = $selection.id;  // Track selection changes
 
   // Just update the display value during dragging
   function handleInput(event: Event) {
@@ -28,14 +30,16 @@
     pixelateImage(currentValue, true);
   }
 
-  // Only update values from store when processing state changes or selection changes
-  $: {
+  // Only update values when selection changes (new image selected)
+  $: if ($selection.id !== lastSelectionId) {
     currentValue = $selection.pixelSize;
     displayValue = currentValue;
+    lastSelectionId = $selection.id;
   }
 
-  // Check if buttons should be disabled
-  $: isDisabled = !$selection.exportedImage || $selection.isPixelizing || $selection.isUploadingFill;
+  // Check if controls should be disabled
+  $: isDisabled = !$selection.exportedImage;
+  $: isProcessing = $selection.isPixelizing || $selection.isUploadingFill || $selection.isPreviewLoading;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -45,13 +49,13 @@
       <div class="relative flex-1">
         <input 
           type="range" 
-          min="1" 
-          max="50" 
+          min={CONSTANTS.MIN_PIXEL_SIZE}
+          max={CONSTANTS.MAX_PIXEL_SIZE}
           value={displayValue}
           on:input={handleInput}
           on:change={handleChange}
-          class="w-full {isDisabled || $selection.isPreviewLoading ? 'opacity-50' : ''}"
-          disabled={isDisabled || $selection.isPreviewLoading}
+          class="w-full {(isDisabled || isProcessing) ? 'opacity-50' : ''}"
+          disabled={isDisabled || isProcessing}
         />
       </div>
       <span class="text-sm w-8 text-right">{displayValue}</span>
@@ -61,14 +65,14 @@
   <div class="flex gap-2">
     <button 
       on:click={handleApplyEffect}
-      disabled={isDisabled}
+      disabled={isDisabled || isProcessing}
       class="flex-1 bg-blue-500 text-white rounded px-4 py-2 disabled:opacity-50"
     >
       Apply Effect
     </button>
     <button 
       on:click={handleAddNewLayer}
-      disabled={isDisabled}
+      disabled={isDisabled || isProcessing}
       class="flex-1 bg-green-500 text-white rounded px-4 py-2 disabled:opacity-50"
     >
       Add New Layer
@@ -79,14 +83,5 @@
 <style>
   .relative {
     position: relative;
-  }
-  .absolute {
-    position: absolute;
-  }
-  .inset-0 {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
   }
 </style>

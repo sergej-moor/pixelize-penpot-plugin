@@ -15,7 +15,7 @@ interface SelectionState {
     width: number;
     height: number;
   };
-  previewData?: {
+  previewImage?: {
     data: number[];
     width: number;
     height: number;
@@ -58,7 +58,7 @@ export function updateSelection(shapes: any) {
     // Clear all image data
     originalImage: undefined,
     exportedImage: undefined,
-    previewData: undefined,
+    previewImage: undefined,
   }));
 }
 
@@ -91,7 +91,7 @@ export async function updatePreview(pixelSize: number) {
       ...state,
       pixelSize,
       isPreviewLoading: false,
-      previewData: {
+      previewImage: {
         width: state.originalImage!.width,
         height: state.originalImage!.height,
         data: Array.from(processed.data),

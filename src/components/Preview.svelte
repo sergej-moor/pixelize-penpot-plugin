@@ -1,27 +1,30 @@
 <script lang="ts">
   import { selection } from '../stores/selection';
 
-  // Track URLs for cleanup
-  let previewUrls: string[] = [];
+  // Track URL for cleanup
+  let previewUrl: string | undefined;
   
   // Create URL from image data
-  $: if ($selection.previewData?.data || $selection.exportedImage?.data) {
-    // Cleanup old URLs
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
+  $: if ($selection.previewImage?.data || $selection.exportedImage?.data) {
+    // Cleanup old URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     
     // Use preview data if available, otherwise use exported image
-    const imageData = $selection.previewData?.data || $selection.exportedImage?.data;
+    const imageData = $selection.previewImage?.data || $selection.exportedImage?.data;
     if (imageData) {
       const blob = new Blob([new Uint8Array(imageData)], { type: 'image/png' });
-      const url = URL.createObjectURL(blob);
-      previewUrls = [url];
+      previewUrl = URL.createObjectURL(blob);
     }
   }
 
-  // Cleanup URLs when component is destroyed
+  // Cleanup URL when component is destroyed
   import { onDestroy } from 'svelte';
   onDestroy(() => {
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
   });
 </script>
 
@@ -29,10 +32,10 @@
   <h3 class="font-bold mb-2 text-sm">{$selection.name || 'No selection'}</h3>
   
   <div class="preview-content relative">
-    {#if previewUrls[0] && ($selection.previewData || $selection.exportedImage)}
+    {#if previewUrl && ($selection.previewImage || $selection.exportedImage)}
       <div class="image-preview">
         <img 
-          src={previewUrls[0]} 
+          src={previewUrl} 
           alt="Selected shape" 
           class="w-full h-auto rounded {$selection.isPreviewLoading ? 'opacity-50' : ''}"
           style="width: 300px; height: 300px; object-fit: contain;"
