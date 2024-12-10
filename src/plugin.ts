@@ -1,41 +1,37 @@
-import type { PluginMessageEvent } from "./types";
+import type { PluginMessage } from "./types";
 import type { Fill } from "@penpot/plugin-types";
 
-penpot.ui.open("Pixelize", `?theme=${penpot.theme}`, {
+const PLUGIN_CONFIG = {
+  name: "Pixelize",
   width: 408,
   height: 612,
+} as const;
+
+// Initialize plugin
+penpot.ui.open(PLUGIN_CONFIG.name, `?theme=${penpot.theme}`, {
+  width: PLUGIN_CONFIG.width,
+  height: PLUGIN_CONFIG.height,
 });
 
 async function addNewPixelatedLayer(data: {
   imageData: number[];
   width: number;
   height: number;
-  originalFill: any;
-}) {
+  originalFill: Fill;
+}): Promise<void> {
   const blockId = penpot.history.undoBlockBegin();
+
   try {
-    // Upload the processed image data
-    const image = await penpot.uploadMediaData(
-      "pixelated-image",
-      new Uint8Array(data.imageData),
-      "image/png"
-    );
+    const image = await uploadImage(data.imageData);
+    if (!image) return;
 
-    if (image) {
-      // Create a new rectangle with the same dimensions as original
-      const rect = penpot.createRectangle();
-      rect.x = penpot.viewport.center.x;
-      rect.y = penpot.viewport.center.y;
-      rect.resize(data.width, data.height);
-      rect.fills = [
-        {
-          ...data.originalFill,
-          fillImage: image,
-        },
-      ];
+    createPixelatedShape({
+      width: data.width,
+      height: data.height,
+      fill: { ...data.originalFill, fillImage: image },
+    });
 
-      sendMessage({ type: "fill-upload-complete" });
-    }
+    sendMessage({ type: "fill-upload-complete" });
   } catch (error) {
     console.error("Error creating new layer:", error);
   } finally {
@@ -43,74 +39,105 @@ async function addNewPixelatedLayer(data: {
   }
 }
 
-// Handle messages from UI
-penpot.ui.onMessage(async (message: PluginMessageEvent) => {
+async function updateExistingLayer(
+  selection: any,
+  imageData: number[],
+  originalFill: Fill,
+  shouldDeleteFirst: boolean
+): Promise<void> {
+  const image = await uploadImage(imageData);
+  if (!image) return;
+
+  const newFill: Fill = { ...originalFill, fillImage: image };
+
+  if (Array.isArray(selection.fills)) {
+    const lastFill = selection.fills[selection.fills.length - 1];
+    selection.fills = shouldDeleteFirst
+      ? [newFill, lastFill]
+      : [newFill, lastFill];
+  } else {
+    selection.fills = [newFill];
+  }
+
+  sendMessage({ type: "fill-upload-complete" });
+}
+
+async function uploadImage(imageData: number[]): Promise<string | null> {
+  try {
+    return await penpot.uploadMediaData(
+      "exported-image",
+      new Uint8Array(imageData),
+      "image/png"
+    );
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return null;
+  }
+}
+
+function createPixelatedShape({
+  width,
+  height,
+  fill,
+}: {
+  width: number;
+  height: number;
+  fill: Fill;
+}): void {
+  const rect = penpot.createRectangle();
+  rect.x = penpot.viewport.center.x;
+  rect.y = penpot.viewport.center.y;
+  rect.resize(width, height);
+  rect.fills = [fill];
+}
+
+// Message handlers
+penpot.ui.onMessage(async (message: PluginMessage) => {
   if (message.type === "update-image-fill") {
     const selection = penpot.selection[0];
-    if (selection) {
-      try {
-        const imageData = await penpot.uploadMediaData(
-          "exported-image",
-          new Uint8Array(message.imageData),
-          "image/png"
+    if (!selection) return;
+
+    try {
+      if (message.addNewLayer) {
+        await addNewPixelatedLayer({
+          imageData: message.imageData,
+          width: selection.width,
+          height: selection.height,
+          originalFill: message.originalFill,
+        });
+      } else {
+        await updateExistingLayer(
+          selection,
+          message.imageData,
+          message.originalFill,
+          message.shouldDeleteFirst
         );
-
-        if (message.addNewLayer) {
-          // Create new layer instead of updating existing
-          await addNewPixelatedLayer({
-            imageData: message.imageData,
-            width: selection.width,
-            height: selection.height,
-            originalFill: message.originalFill,
-          });
-        } else {
-          // Existing logic for updating current layer
-          const newFill: Fill = {
-            ...message.originalFill,
-            fillImage: imageData,
-          };
-
-          if (Array.isArray(selection.fills)) {
-            const lastFill = selection.fills[selection.fills.length - 1];
-            if (message.shouldDeleteFirst && selection.fills.length >= 2) {
-              selection.fills = [newFill, lastFill];
-            } else {
-              selection.fills = [newFill, lastFill];
-            }
-          } else {
-            selection.fills = [newFill];
-          }
-
-          sendMessage({ type: "fill-upload-complete" });
-        }
-      } catch (error) {
-        console.error("Error updating image fill:", error);
       }
+    } catch (error) {
+      console.error("Error updating image fill:", error);
     }
   }
 });
 
-// Listen for theme changes and send them to UI
+// Event listeners
 penpot.on("themechange", (theme: string) => {
   sendMessage({ type: "theme", content: theme });
 });
 
-// Listen for selection changes and send them to UI
-penpot.on("selectionchange", async () => {
-  const selection = penpot.selection[0];
+penpot.on("selectionchange", handleSelectionChange);
 
+async function handleSelectionChange() {
+  const selection = penpot.selection[0];
   if (!selection) {
     sendMessage({ type: "selection", content: null });
     return;
   }
 
   try {
-    // Set loading state immediately
     sendMessage({ type: "selection-loading", isLoading: true });
-
     const selectionId = Math.random().toString(36).substring(2);
 
-    // First send the initial selection with name and ID
+    // Send initial selection data
     sendMessage({
       type: "selection",
       content: {
@@ -121,13 +148,7 @@ penpot.on("selectionchange", async () => {
     });
 
     if (Array.isArray(selection.fills)) {
-      // Export the image from the shape
-      const imageData = await selection.export({
-        type: "png",
-        scale: 2,
-      });
-
-      // Send the exported image data with the selection ID
+      const imageData = await selection.export({ type: "png", scale: 2 });
       sendMessage({
         type: "selection-loaded",
         imageData: Array.from(imageData),
@@ -136,16 +157,14 @@ penpot.on("selectionchange", async () => {
         selectionId,
       });
     } else {
-      // Clear loading state if no fills
       sendMessage({ type: "selection-loading", isLoading: false });
     }
   } catch (error) {
     console.error("Error exporting selection:", error);
-    // Clear loading state on error
     sendMessage({ type: "selection-loading", isLoading: false });
   }
-});
+}
 
-function sendMessage(message: PluginMessageEvent) {
+function sendMessage(message: PluginMessage): void {
   penpot.ui.sendMessage(message);
 }

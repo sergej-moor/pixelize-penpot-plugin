@@ -1,7 +1,7 @@
 interface ProcessedImage {
-  previewUrl: string;
-  finalUrl: string;
   data: Uint8Array;
+  width: number;
+  height: number;
 }
 
 export async function processImage(
@@ -10,60 +10,56 @@ export async function processImage(
   height: number,
   pixelSize: number
 ): Promise<ProcessedImage> {
-  // Create a blob from the image data
-  const blob = new Blob([imageData], { type: "image/png" });
-  const imageBitmap = await createImageBitmap(blob);
-
-  // Create canvas for processing
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
   const ctx = canvas.getContext("2d")!;
 
-  // Draw original image
+  // Set canvas dimensions
+  canvas.width = width;
+  canvas.height = height;
+
+  // Create and draw original image
+  const blob = new Blob([imageData], { type: "image/png" });
+  const imageBitmap = await createImageBitmap(blob);
   ctx.drawImage(imageBitmap, 0, 0, width, height);
 
-  // Get image data
+  // Get image data for processing
   const originalData = ctx.getImageData(0, 0, width, height);
 
-  // Pixelate
+  // Apply pixelation effect
+  pixelateCanvas(ctx, originalData, width, height, pixelSize);
+
+  // Get processed data
+  const processedBlob = await canvasToBlob(canvas);
+  const processedData = new Uint8Array(await processedBlob.arrayBuffer());
+
+  return { data: processedData, width, height };
+}
+
+function pixelateCanvas(
+  ctx: CanvasRenderingContext2D,
+  imageData: ImageData,
+  width: number,
+  height: number,
+  pixelSize: number
+): void {
   for (let y = 0; y < height; y += pixelSize) {
     for (let x = 0; x < width; x += pixelSize) {
-      // Get the color of the first pixel in the block
       const pixelIndex = (y * width + x) * 4;
-      const r = originalData.data[pixelIndex];
-      const g = originalData.data[pixelIndex + 1];
-      const b = originalData.data[pixelIndex + 2];
-      const a = originalData.data[pixelIndex + 3];
+      const color = {
+        r: imageData.data[pixelIndex],
+        g: imageData.data[pixelIndex + 1],
+        b: imageData.data[pixelIndex + 2],
+        a: imageData.data[pixelIndex + 3],
+      };
 
-      // Fill the block with that color
-      ctx.fillStyle = `rgba(${r},${g},${b},${a / 255})`;
+      ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a / 255})`;
       ctx.fillRect(x, y, pixelSize, pixelSize);
     }
   }
-
-  // Get the processed image as blob
-  const processedBlob = await new Promise<Blob>((resolve) =>
-    canvas.toBlob((blob) => resolve(blob!), "image/png")
-  );
-
-  // Convert blob to array buffer
-  const arrayBuffer = await processedBlob.arrayBuffer();
-  const processedData = new Uint8Array(arrayBuffer);
-
-  // Create URLs for preview
-  const previewUrl = URL.createObjectURL(processedBlob);
-  const finalUrl = previewUrl;
-
-  return {
-    previewUrl,
-    finalUrl,
-    data: processedData,
-  };
 }
 
-export function cleanupImageUrls(urls: string[]) {
-  urls.forEach((url) => {
-    if (url) URL.revokeObjectURL(url);
-  });
+function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
+  return new Promise((resolve) =>
+    canvas.toBlob((blob) => resolve(blob!), "image/png")
+  );
 }
