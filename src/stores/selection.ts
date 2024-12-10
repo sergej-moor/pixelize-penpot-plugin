@@ -68,7 +68,12 @@ export async function updatePreview(pixelSize: number) {
   const currentId = state.id;
 
   try {
-    selection.update((state) => ({ ...state, isPreviewLoading: true }));
+    // Clear any existing preview data before starting new preview
+    selection.update((state) => ({
+      ...state,
+      isPreviewLoading: true,
+      previewImage: undefined, // Clear existing preview
+    }));
 
     const processed = await processImage(
       new Uint8Array(state.originalImage.data),
@@ -99,7 +104,11 @@ export async function updatePreview(pixelSize: number) {
     }));
   } catch (error) {
     console.error("Failed to update preview:", error);
-    selection.update((state) => ({ ...state, isPreviewLoading: false }));
+    selection.update((state) => ({
+      ...state,
+      isPreviewLoading: false,
+      previewImage: undefined, // Clear preview on error
+    }));
   }
 }
 

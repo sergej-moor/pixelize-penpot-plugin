@@ -1,7 +1,7 @@
 import type { PluginMessageEvent } from "./types";
 import type { Fill } from "@penpot/plugin-types";
 
-penpot.ui.open("Plugin Template", `?theme=${penpot.theme}`, {
+penpot.ui.open("Pixelize", `?theme=${penpot.theme}`, {
   width: 408,
   height: 612,
 });

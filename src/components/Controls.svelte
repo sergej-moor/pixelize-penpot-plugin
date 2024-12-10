@@ -1,10 +1,12 @@
 <script lang="ts">
   import { selection, pixelateImage, updatePreview } from '../stores/selection';
   import { CONSTANTS } from '../constants';
+  import { FilePlus,CopyPlus, Paintbrush } from 'lucide-svelte';
+
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
-  let lastSelectionId = $selection.id;  // Track selection changes
+  let lastSelectionId = $selection.id;
 
   // Just update the display value during dragging
   function handleInput(event: Event) {
@@ -62,26 +64,22 @@
     </div>
   </label>
 
-  <div class="flex gap-2">
+  <div class="flex flex-col gap-2">
     <button 
       on:click={handleApplyEffect}
+      data-appearance="primary"
       disabled={isDisabled || isProcessing}
-      class="flex-1 bg-blue-500 text-white rounded px-4 py-2 disabled:opacity-50"
+       class="flex-1  flex justify-center gap-2 items-center"
     >
-      Apply Effect
+   Apply to shape
     </button>
     <button 
       on:click={handleAddNewLayer}
       disabled={isDisabled || isProcessing}
-      class="flex-1 bg-green-500 text-white rounded px-4 py-2 disabled:opacity-50"
+      data-appearance="primary"
+      class="flex-1  flex justify-center gap-2 items-center"
     >
-      Add New Layer
+Create new Shape
     </button>
   </div>
 </div>
-
-<style>
-  .relative {
-    position: relative;
-  }
-</style>

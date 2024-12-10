@@ -1,5 +1,6 @@
 <script lang="ts">
   import { selection } from '../stores/selection';
+  import { CONSTANTS } from '../constants';
 
   // Track URL for cleanup
   let previewUrl: string | undefined;
@@ -21,6 +22,7 @@
 
   // Cleanup URL when component is destroyed
   import { onDestroy } from 'svelte';
+  import Spinner from './Spinner.svelte';
   onDestroy(() => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -28,36 +30,37 @@
   });
 </script>
 
-<div class="preview-container p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-  <h3 class="font-bold mb-2 text-sm">{$selection.name || 'No selection'}</h3>
-  
-  <div class="preview-content relative">
+<h3 class="font-bold text-sm ">Selection: {$selection.name || 'No selection'}</h3>
+
+<div class="rounded-lg border border-gray-200 dark:border-gray-700">
+  <div class="relative w-[300px] h-[300px] min-h-[100px]">
     {#if previewUrl && ($selection.previewImage || $selection.exportedImage)}
-      <div class="image-preview">
+      <div class="flex items-center justify-center relative w-full h-full">
         <img 
           src={previewUrl} 
           alt="Selected shape" 
-          class="w-full h-auto rounded {$selection.isPreviewLoading ? 'opacity-50' : ''}"
-          style="width: 300px; height: 300px; object-fit: contain;"
+          class="w-[300px] h-[300px] max-w-full max-h-[300px] p-2 object-contain rounded transition-opacity {$selection.isPreviewLoading ? 'opacity-50' : ''}"
         />
         {#if $selection.isPreviewLoading || $selection.isPixelizing || $selection.isUploadingFill}
-          <div class="loading-overlay absolute inset-0 flex items-center justify-center bg-black/50 rounded">
+          <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded transition-all duration-200">
+            <Spinner></Spinner>
             <p class="text-sm text-white font-medium">
               {#if $selection.isPreviewLoading}
                 Updating preview...
               {:else if $selection.isPixelizing}
-                Pixelizing image...
+                Pixelizing...
               {:else}
-                Uploading fill...
+                Uploading...
               {/if}
             </p>
           </div>
         {/if}
       </div>
     {:else}
-      <div class="empty-state flex items-center justify-center p-8 bg-gray-100 dark:bg-gray-800 rounded">
-        <p class="text-sm text-gray-600 dark:text-gray-400">
+      <div class="flex items-center justify-center w-full h-full">
+        <p class="text-sm">
           {#if $selection.name}
+          <Spinner></Spinner>
             Loading image...
           {:else}
             Select an image to begin
@@ -67,34 +70,3 @@
     {/if}
   </div>
 </div>
-
-<style>
-  .preview-container {
-    background: var(--surface-color, white);
-  }
-
-  .preview-content {
-    min-height: 100px;
-    width: 300px;
-    height: 300px;
-  }
-
-  .image-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  img {
-    max-width: 100%;
-    max-height: 300px;
-    width: 300px;
-    height: 300px;
-  }
-
-  .loading-overlay {
-    backdrop-filter: blur(2px);
-    transition: all 0.2s ease;
-  }
-</style>
