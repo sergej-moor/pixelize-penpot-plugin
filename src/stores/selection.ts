@@ -10,10 +10,16 @@ interface SelectionState {
     width: number;
     height: number;
   };
+  previewData?: {
+    data: number[];
+    width: number;
+    height: number;
+  };
   isUploadingFill: boolean;
   isPixelizing: boolean;
   pixelSize: number;
   isLoading: boolean;
+  isPreviewLoading: boolean;
 }
 
 const initialState: SelectionState = {
@@ -21,6 +27,7 @@ const initialState: SelectionState = {
   isPixelizing: false,
   pixelSize: 1,
   isLoading: false,
+  isPreviewLoading: false,
 };
 
 export const selection = writable<SelectionState>(initialState);
@@ -30,6 +37,36 @@ export function updateSelection(shapes: any) {
     ...initialState,
     ...shapes,
   }));
+}
+
+export async function updatePreview(pixelSize: number) {
+  const state = get(selection);
+  if (!state.exportedImage) return;
+
+  try {
+    selection.update((state) => ({ ...state, isPreviewLoading: true }));
+
+    const processed = await processImage(
+      new Uint8Array(state.exportedImage.data),
+      state.exportedImage.width,
+      state.exportedImage.height,
+      pixelSize
+    );
+
+    selection.update((state) => ({
+      ...state,
+      pixelSize,
+      isPreviewLoading: false,
+      previewData: {
+        width: state.exportedImage!.width,
+        height: state.exportedImage!.height,
+        data: Array.from(processed.data),
+      },
+    }));
+  } catch (error) {
+    console.error("Failed to update preview:", error);
+    selection.update((state) => ({ ...state, isPreviewLoading: false }));
+  }
 }
 
 export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {

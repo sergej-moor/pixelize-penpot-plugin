@@ -1,13 +1,22 @@
 <script lang="ts">
-  import { selection, pixelateImage } from '../stores/selection';
+  import { selection, pixelateImage, updatePreview } from '../stores/selection';
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
+  let previewTimeout: number;
 
-  // Just update the visual value during dragging
+  // Update preview while dragging
   function handleInput(event: Event) {
     const input = event.target as HTMLInputElement;
-    displayValue = parseInt(input.value);
+    const pixelSize = parseInt(input.value);
+    displayValue = pixelSize;
+    
+    // Clear previous timeout
+    clearTimeout(previewTimeout);
+    // Set new timeout
+    previewTimeout = setTimeout(() => {
+      updatePreview(pixelSize);
+    }, 100);
   }
 
   // Update stored value without processing
@@ -50,8 +59,8 @@
           value={displayValue}
           on:input={handleInput}
           on:change={handleChange}
-          class="w-full {isDisabled ? 'opacity-50' : ''}"
-          disabled={isDisabled}
+          class="w-full {isDisabled || $selection.isPreviewLoading ? 'opacity-50' : ''}"
+          disabled={isDisabled || $selection.isPreviewLoading}
         />
       </div>
       <span class="text-sm w-8 text-right">{displayValue}</span>
