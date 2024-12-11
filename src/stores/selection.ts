@@ -1,40 +1,18 @@
 import { writable, get } from "svelte/store";
 import type { Fill } from "@penpot/plugin-types";
 import { processImage } from "../utils/imageProcessing";
-
-interface SelectionState {
-  fills?: any[];
-  name?: string;
-  originalImage?: {
-    data: number[];
-    width: number;
-    height: number;
-  };
-  exportedImage?: {
-    data: number[];
-    width: number;
-    height: number;
-  };
-  previewImage?: {
-    data: number[];
-    width: number;
-    height: number;
-  };
-  isUploadingFill: boolean;
-  isPixelizing: boolean;
-  pixelSize: number;
-  isLoading: boolean;
-  isPreviewLoading: boolean;
-  id?: string;
-}
+import type { SelectionState } from "../types";
 
 const initialState: SelectionState = {
-  isUploadingFill: false,
-  isPixelizing: false,
-  pixelSize: 1,
+  id: "",
+  name: "",
+  fills: [],
   isLoading: false,
+  isPixelizing: false,
+  isUploadingFill: false,
   isPreviewLoading: false,
-  id: undefined,
+  pixelSize: 1,
+  error: undefined,
 };
 
 export const selection = writable<SelectionState>(initialState);

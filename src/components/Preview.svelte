@@ -1,36 +1,37 @@
 <script lang="ts">
-  import { selection } from '../stores/selection';
-  import { CONSTANTS, LOADING_MESSAGES } from '../constants';
-  import Spinner from './Spinner.svelte';
   import { onDestroy } from 'svelte';
+  import { selection } from '../stores/selection';
+  import { LOADING_MESSAGES } from '../constants';
   import { createImageUrl, revokeImageUrl } from '../utils/imageUrl';
+  import Spinner from './Spinner.svelte';
 
+  // URL management
   let previewUrl: string | undefined;
   
-  // Create URL from image data
   $: {
     const imageData = $selection.previewImage?.data || $selection.exportedImage?.data;
-    
-    // Cleanup old URL
     revokeImageUrl(previewUrl);
-    
-    // Create new URL if we have image data
     previewUrl = imageData ? createImageUrl(imageData) : undefined;
   }
 
-  $: displayName = $selection.name 
-    ? ($selection.name.length > 28 ? $selection.name.slice(0, 25) + '...' : $selection.name) 
-    : 'No selection';
+  // Computed properties
+  $: displayName = formatDisplayName($selection.name);
+  $: loadingMessage = getLoadingMessage($selection);
 
-  $: loadingMessage = $selection.isPreviewLoading 
-    ? LOADING_MESSAGES.PREVIEW
-    : $selection.isPixelizing 
-      ? LOADING_MESSAGES.PIXELIZING 
-      : LOADING_MESSAGES.UPLOADING;
+  // Cleanup on destroy
+  onDestroy(() => revokeImageUrl(previewUrl));
 
-  onDestroy(() => {
-    revokeImageUrl(previewUrl);
-  });
+  // Helper functions
+  function formatDisplayName(name?: string): string {
+    if (!name) return 'No selection';
+    return name.length > 28 ? `${name.slice(0, 25)}...` : name;
+  }
+
+  function getLoadingMessage(state: typeof $selection): string {
+    if (state.isPreviewLoading) return LOADING_MESSAGES.PREVIEW;
+    if (state.isPixelizing) return LOADING_MESSAGES.PIXELIZING;
+    return LOADING_MESSAGES.UPLOADING;
+  }
 </script>
 
 <h3 class="font-bold text-sm">Selection: {displayName}</h3>

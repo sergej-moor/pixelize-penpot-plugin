@@ -1,32 +1,56 @@
-export type PluginMessage =
-  | { type: "theme"; content: string }
-  | { type: "selection"; content: SelectionState | null }
-  | { type: "selection-loaded"; imageData: ImageData & { selectionId: string } }
-  | { type: "selection-loading"; isLoading: boolean }
-  | {
-      type: "update-image-fill";
-      imageData: ImageData & { addNewLayer: boolean };
-    }
-  | { type: "fill-upload-complete" }
-  | { type: "delete-top-layer" };
-// Add more message types here
+import type { Fill, ImageData as PenpotImageData } from "@penpot/plugin-types";
 
 export interface ImageData {
-  data: number[];
+  data: Uint8Array;
   width: number;
   height: number;
 }
 
 export interface SelectionState {
-  fills?: any[];
-  name?: string;
-  originalImage?: ImageData;
-  exportedImage?: ImageData;
-  previewImage?: ImageData;
-  isUploadingFill: boolean;
-  isPixelizing: boolean;
-  pixelSize: number;
+  id: string;
+  name: string;
+  fills: Fill[] | "mixed";
   isLoading: boolean;
+  isPixelizing: boolean;
+  isUploadingFill: boolean;
   isPreviewLoading: boolean;
-  id?: string;
+  pixelSize: number;
+  error?: string;
+  originalImage?: {
+    data: number[];
+    width: number;
+    height: number;
+  };
+  exportedImage?: {
+    data: number[];
+    width: number;
+    height: number;
+  };
+  previewImage?: {
+    data: number[];
+    width: number;
+    height: number;
+  };
 }
+
+export type PluginMessage =
+  | { type: "theme"; content: string }
+  | { type: "selection"; content: SelectionState | null }
+  | {
+      type: "selection-loaded";
+      imageData: Uint8Array;
+      width: number;
+      height: number;
+      selectionId: string;
+    }
+  | { type: "selection-loading"; isLoading: boolean }
+  | {
+      type: "update-image-fill";
+      imageData: Uint8Array;
+      addNewLayer: boolean;
+      originalFill: Fill;
+      shouldDeleteFirst: boolean;
+    }
+  | { type: "fill-upload-complete" }
+  | { type: "delete-top-layer" }
+  | { type: "clear-all-except-last" };
