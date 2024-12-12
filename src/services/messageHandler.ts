@@ -10,7 +10,7 @@ import { selection } from '../stores/selection';
 import type { SelectionState } from '../types';
 
 export class MessageHandler {
-  static handle(event: MessageEvent<PluginMessage>) {
+  static handle(event: MessageEvent<PluginMessage>): void {
     try {
       const message = event.data;
 
@@ -19,9 +19,15 @@ export class MessageHandler {
           updateTheme(message.content);
           break;
 
-        case 'selection':
-          updateSelection(message.content);
+        case 'selection': {
+          const selectionData = message.content && {
+            id: message.content.id,
+            name: message.content.name,
+            fills: message.content.fills as unknown[],
+          };
+          updateSelection(selectionData);
           break;
+        }
 
         case 'selection-loading':
           setLoading(message.isLoading);

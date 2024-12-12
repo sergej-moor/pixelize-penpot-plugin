@@ -5,7 +5,7 @@
   import { MessageHandler } from './services/messageHandler';
   import ErrorBoundary from './components/ErrorBoundary.svelte';
 
-  function handlePreviewError(error: Error) {
+  function handlePreviewError(error: Error): void {
     // Report to error tracking service
     console.error('Preview error:', error);
   }

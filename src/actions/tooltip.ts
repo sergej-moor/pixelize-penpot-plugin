@@ -1,14 +1,16 @@
+interface TooltipParams {
+  text: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
+  maxWidth?: string;
+  textClass?: string;
+  paddingClass?: string;
+  background?: string;
+}
+
 export const tooltip = (
   node: HTMLElement,
-  param: {
-    text: string;
-    position?: 'top' | 'bottom' | 'left' | 'right';
-    maxWidth?: string;
-    textClass?: string;
-    paddingClass?: string;
-    background?: string;
-  }
-): { update: (params: any) => void; destroy: () => void } => {
+  param: TooltipParams
+): { update: (params: TooltipParams) => void; destroy: () => void } => {
   let alreadyLeft: boolean;
   const {
     text,
@@ -150,11 +152,7 @@ export const tooltip = (
       text,
       position: newPosition,
       maxWidth: newMaxWidth,
-    }: {
-      text?: string;
-      position?: 'top' | 'bottom' | 'left' | 'right';
-      maxWidth?: string;
-    }): void => {
+    }: TooltipParams): void => {
       if (text) updatedText = text;
       if (newPosition) position = newPosition;
       if (newMaxWidth) maxWidth = newMaxWidth;

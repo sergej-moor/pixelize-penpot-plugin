@@ -4,7 +4,6 @@
   import { LOADING_MESSAGES } from '../constants';
   import { createImageUrl, revokeImageUrl } from '../utils/imageUrl';
   import Spinner from './Spinner.svelte';
-  import { tooltip } from '../actions/tooltip';
 
   // URL management
   let previewUrl: string | undefined;
@@ -21,7 +20,7 @@
   $: loadingMessage = getLoadingMessage($selection);
 
   // Cleanup on destroy
-  onDestroy(() => revokeImageUrl(previewUrl));
+  onDestroy((): void => revokeImageUrl(previewUrl));
 
   // Helper functions
   function formatDisplayName(name?: string): string {

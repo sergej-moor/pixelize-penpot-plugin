@@ -1,4 +1,4 @@
-import type { Fill, ImageData as PenpotImageData } from '@penpot/plugin-types';
+import type { Fill } from '@penpot/plugin-types';
 
 // Data Types
 export interface ImageData {
