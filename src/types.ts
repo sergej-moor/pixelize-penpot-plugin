@@ -53,4 +53,4 @@ export type PluginMessage =
     }
   | { type: "fill-upload-complete" }
   | { type: "delete-top-layer" }
-  | { type: "clear-all-except-last" };
+  | { type: "export-error"; error: string };

@@ -115,7 +115,7 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
     // Send the processed image to be uploaded
     const message = {
       type: "update-image-fill" as const,
-      imageData: Array.from(processed.data),
+      imageData: processed.data,
       fillIndex: 0,
       originalFill: state.fills[state.fills.length - 1],
       shouldDeleteFirst: !addNewLayer && state.fills.length >= 2,

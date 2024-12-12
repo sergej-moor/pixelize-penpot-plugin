@@ -199,9 +199,8 @@ async function handlePluginMessage(message: PluginMessage): Promise<void> {
     case "delete-top-layer":
       deleteTopLayer(selection);
       break;
-    case "clear-all-except-last":
-      clearAllExceptLast(selection);
-      break;
+    default:
+      console.warn(`Unhandled message type: ${message.type}`);
   }
 }
 

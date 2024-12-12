@@ -1,8 +1,6 @@
 <script lang="ts">
   import { selection, pixelateImage, updatePreview } from '../stores/selection';
   import { CONSTANTS } from '../constants';
-  import { FilePlus,CopyPlus, Paintbrush } from 'lucide-svelte';
-
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
@@ -32,15 +30,16 @@
     }
   }
 
-  // Watch for changes to realtimePreview
-  $: if (realtimePreview !== previousRealtimeState) {
-    if (realtimePreview) {
-      handleApplyEffect();
-    } else if ($selection.fills && $selection.fills.length > 1) {
-      // When realtime is turned off and we have multiple fills
-      handleDeleteTopLayer();
+  // Watch for changes in realtime preview and selection fills
+  $: {
+    if ( previousRealtimeState !== realtimePreview) {
+      if (realtimePreview) {
+        handleApplyEffect();
+      } else if ($selection.fills.length > 0) {
+        handleDeleteTopLayer();
+      }
+      previousRealtimeState = realtimePreview;
     }
-    previousRealtimeState = realtimePreview;
   }
 
   function handleApplyEffect() {
@@ -49,12 +48,6 @@
 
   function handleAddNewLayer() {
     pixelateImage(currentValue, true);
-  }
-
-  function handleClearAllExceptLast() {
-    window.parent.postMessage({
-      type: "clear-all-except-last",
-    }, "*");
   }
 
   function handleDeleteTopLayer() {
@@ -74,14 +67,11 @@
   $: isDisabled = !$selection.exportedImage;
   $: isProcessing = $selection.isPixelizing || $selection.isUploadingFill || $selection.isPreviewLoading;
   $: shouldDisableApply = isDisabled || isProcessing || realtimePreview;
-
-  // Add this reactive variable to check if we have multiple fills
-  $: hasMultipleFills = $selection.fills && $selection.fills.length > 1;
 </script>
 
 <div class="flex flex-col gap-4">
   <div class="checkbox-container flex items-center justify-end gap-2">
-    <label for="realtimePreview" class=" text-sm">
+    <label for="realtimePreview" class="text-sm">
       Realtime
     </label>
     <input
@@ -91,7 +81,6 @@
       disabled={isDisabled || isProcessing}
       class="checkbox-input"
     />
-   
   </div>
 
   <label class="slider-row">
@@ -112,8 +101,6 @@
       <span class="text-sm w-8 text-right">{displayValue}</span>
     </div>
   </label>
-
-
 
   <div class="flex flex-col gap-2">
     <button 

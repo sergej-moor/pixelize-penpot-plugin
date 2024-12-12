@@ -6,42 +6,33 @@ import {
   setUploadingFill,
   setLoading,
 } from "../stores/selection";
+import { selection } from "../stores/selection";
+import type { SelectionState } from "../types";
 
 export class MessageHandler {
   static handle(event: MessageEvent<PluginMessage>) {
     try {
-      const { type, ...data } = event.data;
+      const message = event.data;
 
-      switch (type) {
+      switch (message.type) {
         case "theme":
-          updateTheme(data.content);
+          updateTheme(message.content);
           break;
 
         case "selection":
-          updateSelection(data.content);
+          updateSelection(message.content);
           break;
 
         case "selection-loading":
-          setLoading(data.isLoading);
+          setLoading(message.isLoading);
           break;
 
         case "selection-loaded":
-          if (data.error) {
-            console.error("Export error:", data.error);
-            setLoading(false);
-            // Show error in UI
-            selection.update((state) => ({
-              ...state,
-              error:
-                "Failed to export selection. Please try a different shape or refresh the page.",
-            }));
-            return;
-          }
           updateExportedImage(
-            data.imageData,
-            data.width,
-            data.height,
-            data.selectionId
+            Array.from(message.imageData),
+            message.width,
+            message.height,
+            message.selectionId
           );
           break;
 
@@ -50,16 +41,16 @@ export class MessageHandler {
           break;
 
         case "export-error":
-          console.error("Export error:", data.error);
+          console.error("Export error:", message.error);
           setLoading(false);
-          selection.update((state) => ({
+          selection.update((state: SelectionState) => ({
             ...state,
             error: "Export failed. The image might be too large or complex.",
           }));
           break;
 
         default:
-          console.warn(`Unhandled message type: ${type}`);
+          console.warn(`Unhandled message type: ${message.type}`);
       }
     } catch (error) {
       console.error("Message handler error:", error);
