@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { selection, pixelateImage, updatePreview } from '../stores/selection';
+  import { selection, processImage, updatePreview } from '../stores/selection';
   import { CONSTANTS } from '../constants';
   import { tooltip } from '../actions/tooltip';
 
-  let currentValue = $selection.pixelSize;
+  let currentValue = $selection.effectIntensity;
   let displayValue = currentValue;
   let lastSelectionId = $selection.id;
   let realtimePreview = false;
@@ -22,10 +22,8 @@
     currentValue = pixelSize;
     displayValue = pixelSize;
 
-    // Update the preview
     updatePreview(pixelSize);
 
-    // If realtime preview is enabled, apply the effect immediately
     if (realtimePreview) {
       handleApplyEffect();
     }
@@ -44,11 +42,11 @@
   }
 
   function handleApplyEffect(): void {
-    pixelateImage(currentValue, false);
+    processImage(currentValue, false);
   }
 
   function handleAddNewLayer(): void {
-    pixelateImage(currentValue, true);
+    processImage(currentValue, true);
   }
 
   function handleDeleteTopLayer(): void {
@@ -62,15 +60,15 @@
 
   // Only update values when selection changes (new image selected)
   $: if ($selection.id !== lastSelectionId) {
-    currentValue = $selection.pixelSize;
+    currentValue = $selection.effectIntensity;
     displayValue = currentValue;
     lastSelectionId = $selection.id;
   }
 
   // Check if controls should be disabled
-  $: isDisabled = !$selection.exportedImage;
+  $: isDisabled = !$selection.processedImage;
   $: isProcessing =
-    $selection.isPixelizing ||
+    $selection.isProcessing ||
     $selection.isUploadingFill ||
     $selection.isPreviewLoading;
   $: shouldDisableApply = isDisabled || isProcessing || realtimePreview;
@@ -105,7 +103,7 @@
         position: 'right',
       }}
     >
-      Pixel Size:
+      Pixel Size
     </span>
     <div class="flex items-center gap-2">
       <div class="relative flex-1">

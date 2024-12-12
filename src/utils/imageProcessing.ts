@@ -4,7 +4,7 @@ interface ProcessedImage {
   height: number;
 }
 
-export async function processImage(
+export async function pixelateImage(
   imageData: Uint8Array,
   width: number,
   height: number,

@@ -9,7 +9,7 @@
 
   $: {
     const imageData =
-      $selection.previewImage?.data || $selection.exportedImage?.data;
+      $selection.previewImage?.data || $selection.processedImage?.data;
     revokeImageUrl(previewUrl);
     previewUrl = imageData ? createImageUrl(imageData) : undefined;
   }
@@ -29,7 +29,7 @@
 
   function getLoadingMessage(state: typeof $selection): string {
     if (state.isPreviewLoading) return LOADING_MESSAGES.PREVIEW;
-    if (state.isPixelizing) return LOADING_MESSAGES.PIXELIZING;
+    if (state.isProcessing) return LOADING_MESSAGES.PROCESSING;
     return LOADING_MESSAGES.UPLOADING;
   }
 </script>
@@ -51,7 +51,7 @@
         />
 
         <!-- Loading Overlay -->
-        {#if $selection.isPreviewLoading || $selection.isPixelizing || $selection.isUploadingFill}
+        {#if $selection.isPreviewLoading || $selection.isProcessing || $selection.isUploadingFill}
           <div
             class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded transition-all duration-200"
           >

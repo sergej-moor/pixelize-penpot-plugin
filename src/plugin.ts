@@ -1,5 +1,5 @@
 import type {
-  PixelatedShapeConfig,
+  ProcessedShapeConfig,
   NewLayerConfig,
   PluginMessage,
   SelectionState,
@@ -55,11 +55,11 @@ async function uploadImage(imageData: Uint8Array): Promise<PenpotImageData> {
 }
 
 // Shape creation
-function createPixelatedShape({
+function createProcessedShape({
   width,
   height,
   imageFill,
-}: PixelatedShapeConfig): void {
+}: ProcessedShapeConfig): void {
   const rect = penpot.createRectangle();
   rect.x = penpot.viewport.center.x;
   rect.y = penpot.viewport.center.y;
@@ -68,7 +68,7 @@ function createPixelatedShape({
 }
 
 // Layer management
-async function addNewPixelatedLayer(data: NewLayerConfig): Promise<void> {
+async function addNewProcessedLayer(data: NewLayerConfig): Promise<void> {
   const blockId = penpot.history.undoBlockBegin();
 
   try {
@@ -79,7 +79,7 @@ async function addNewPixelatedLayer(data: NewLayerConfig): Promise<void> {
       fillImage: imageUrl,
     };
 
-    createPixelatedShape({
+    createProcessedShape({
       width: data.width,
       height: data.height,
       imageFill,
@@ -164,10 +164,10 @@ async function handleSelectionChange(): Promise<void> {
       name: selection.name,
       fills: selection.fills,
       isLoading: true,
-      isPixelizing: false,
+      isProcessing: false,
       isUploadingFill: false,
       isPreviewLoading: false,
-      pixelSize: 1,
+      effectIntensity: 1,
     };
 
     sendMessage({ type: 'selection', content: selectionState });
@@ -220,7 +220,7 @@ async function handleImageFillUpdate(
 ): Promise<void> {
   try {
     if (message.addNewLayer) {
-      await addNewPixelatedLayer({
+      await addNewProcessedLayer({
         imageData: message.imageData,
         width: selection.width,
         height: selection.height,

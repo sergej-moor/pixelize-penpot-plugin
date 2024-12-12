@@ -8,7 +8,7 @@ export interface ImageData {
 }
 
 // Plugin Configuration Types
-export interface PixelatedShapeConfig {
+export interface ProcessedShapeConfig {
   width: number;
   height: number;
   imageFill: Fill & { type: 'image' };
@@ -27,17 +27,17 @@ export interface SelectionState {
   name: string;
   fills: Fill[] | 'mixed';
   isLoading: boolean;
-  isPixelizing: boolean;
+  isProcessing: boolean;
   isUploadingFill: boolean;
   isPreviewLoading: boolean;
-  pixelSize: number;
+  effectIntensity: number;
   error?: string;
   originalImage?: {
     data: number[];
     width: number;
     height: number;
   };
-  exportedImage?: {
+  processedImage?: {
     data: number[];
     width: number;
     height: number;
