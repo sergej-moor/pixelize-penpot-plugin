@@ -12,15 +12,8 @@ export const tooltip = (
   param: TooltipParams
 ): { update: (params: TooltipParams) => void; destroy: () => void } => {
   let alreadyLeft: boolean;
-  const {
-    text,
-    position = 'top',
-    maxWidth = 'max-w-xs',
-    textClass,
-    // Remove unused parameters
-    // paddingClass,
-    // background,
-  } = param;
+  const { text, textClass } = param;
+  let { position = 'top', maxWidth = 'max-w-xs' } = param;
   let timer: number;
   let updatedText: string;
 
