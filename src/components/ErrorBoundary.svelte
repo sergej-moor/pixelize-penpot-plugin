@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  
-  export let fallback: string = "Something went wrong. Please try again.";
+
+  export let fallback: string = 'Something went wrong. Please try again.';
   export let onError: ((error: Error) => void) | undefined = undefined;
-  
+
   let error: Error | null = null;
-  
+
   onMount(() => {
     window.addEventListener('error', (e: ErrorEvent) => {
       error = e.error;
@@ -25,4 +25,4 @@
   </div>
 {:else}
   <slot />
-{/if} 
+{/if}

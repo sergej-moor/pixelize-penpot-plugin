@@ -1,13 +1,13 @@
-import type { PluginMessage } from "../types";
-import { updateTheme } from "../stores/theme";
+import type { PluginMessage } from '../types';
+import { updateTheme } from '../stores/theme';
 import {
   updateSelection,
   updateExportedImage,
   setUploadingFill,
   setLoading,
-} from "../stores/selection";
-import { selection } from "../stores/selection";
-import type { SelectionState } from "../types";
+} from '../stores/selection';
+import { selection } from '../stores/selection';
+import type { SelectionState } from '../types';
 
 export class MessageHandler {
   static handle(event: MessageEvent<PluginMessage>) {
@@ -15,19 +15,19 @@ export class MessageHandler {
       const message = event.data;
 
       switch (message.type) {
-        case "theme":
+        case 'theme':
           updateTheme(message.content);
           break;
 
-        case "selection":
+        case 'selection':
           updateSelection(message.content);
           break;
 
-        case "selection-loading":
+        case 'selection-loading':
           setLoading(message.isLoading);
           break;
 
-        case "selection-loaded":
+        case 'selection-loaded':
           updateExportedImage(
             Array.from(message.imageData),
             message.width,
@@ -36,17 +36,17 @@ export class MessageHandler {
           );
           break;
 
-        case "fill-upload-complete":
+        case 'fill-upload-complete':
           setUploadingFill(false);
           break;
 
-        case "export-error":
-          console.error("Export error:", message.error);
+        case 'export-error':
+          console.error('Export error:', message.error);
           setLoading(false);
           selection.update((state: SelectionState) => ({
             ...state,
             error:
-              "Export failed. The image might be too large or in a unsupported file format.",
+              'Export failed. The image might be too large or in a unsupported file format.',
           }));
           break;
 
@@ -54,7 +54,7 @@ export class MessageHandler {
           console.warn(`Unhandled message type: ${message.type}`);
       }
     } catch (error) {
-      console.error("Message handler error:", error);
+      console.error('Message handler error:', error);
       setLoading(false);
     }
   }

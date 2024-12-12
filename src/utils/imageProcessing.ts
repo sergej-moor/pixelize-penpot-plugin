@@ -10,15 +10,15 @@ export async function processImage(
   height: number,
   pixelSize: number
 ): Promise<ProcessedImage> {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
 
   // Set canvas dimensions
   canvas.width = width;
   canvas.height = height;
 
   // Create and draw original image
-  const blob = new Blob([imageData], { type: "image/png" });
+  const blob = new Blob([imageData], { type: 'image/png' });
   const imageBitmap = await createImageBitmap(blob);
   ctx.drawImage(imageBitmap, 0, 0, width, height);
 
@@ -60,6 +60,6 @@ function pixelateCanvas(
 
 function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve) =>
-    canvas.toBlob((blob) => resolve(blob!), "image/png")
+    canvas.toBlob((blob) => resolve(blob!), 'image/png')
   );
 }

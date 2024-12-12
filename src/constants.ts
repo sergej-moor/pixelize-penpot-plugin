@@ -7,9 +7,9 @@ export const CONSTANTS = {
 } as const;
 
 export const LOADING_MESSAGES = {
-  PREVIEW: "Updating preview...",
-  PIXELIZING: "Pixelizing image...",
-  UPLOADING: "Uploading fill...",
-  INITIAL: "Loading selection",
-  NO_SELECTION: "Select something to begin",
+  PREVIEW: 'Updating preview...',
+  PIXELIZING: 'Pixelizing image...',
+  UPLOADING: 'Uploading fill...',
+  INITIAL: 'Loading selection',
+  NO_SELECTION: 'Select something to begin',
 } as const;

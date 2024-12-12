@@ -1,11 +1,10 @@
-import { writable, get } from "svelte/store";
-import type { Fill } from "@penpot/plugin-types";
-import { processImage } from "../utils/imageProcessing";
-import type { SelectionState } from "../types";
+import { writable, get } from 'svelte/store';
+import { processImage } from '../utils/imageProcessing';
+import type { SelectionState } from '../types';
 
 const initialState: SelectionState = {
-  id: "",
-  name: "",
+  id: '',
+  name: '',
   fills: [],
   isLoading: false,
   isPixelizing: false,
@@ -17,7 +16,9 @@ const initialState: SelectionState = {
 
 export const selection = writable<SelectionState>(initialState);
 
-export function updateSelection(shapes: any) {
+export function updateSelection(
+  shapes: { id: string; name: string; fills: unknown[] } | null
+): void {
   // If no shapes or shapes is null, reset to initial state
   if (!shapes) {
     selection.set(initialState);
@@ -37,7 +38,7 @@ export function updateSelection(shapes: any) {
   }));
 }
 
-export async function updatePreview(pixelSize: number) {
+export async function updatePreview(pixelSize: number): Promise<void> {
   const state = get(selection);
   if (!state.originalImage || !state.name || !state.fills || !state.id) return;
   const currentId = state.id;
@@ -78,7 +79,7 @@ export async function updatePreview(pixelSize: number) {
       },
     }));
   } catch (error) {
-    console.error("Failed to update preview:", error);
+    console.error('Failed to update preview:', error);
     selection.update((state) => ({
       ...state,
       isPreviewLoading: false,
@@ -87,7 +88,10 @@ export async function updatePreview(pixelSize: number) {
   }
 }
 
-export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
+export async function pixelateImage(
+  pixelSize: number,
+  addNewLayer: boolean
+): Promise<void> {
   const state = get(selection);
   if (!state.originalImage || !state.fills?.length || !state.name) return;
 
@@ -111,14 +115,14 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
 
     // Send the processed image to be uploaded
     const message = {
-      type: "update-image-fill" as const,
+      type: 'update-image-fill' as const,
       imageData: processed.data,
       fillIndex: 0,
       originalFill: state.fills[state.fills.length - 1],
       shouldDeleteFirst: !addNewLayer && state.fills.length >= 2,
       addNewLayer,
     };
-    window.parent.postMessage(message, "*");
+    window.parent.postMessage(message, '*');
 
     // Update the preview with the processed image
     selection.update((state) => ({
@@ -132,7 +136,7 @@ export async function pixelateImage(pixelSize: number, addNewLayer: boolean) {
       },
     }));
   } catch (error) {
-    console.error("Failed to pixelate image:", error);
+    console.error('Failed to pixelate image:', error);
     selection.update((state) => ({ ...state, isPixelizing: false }));
   }
 }
@@ -142,7 +146,7 @@ export function updateExportedImage(
   width: number,
   height: number,
   selectionId: string
-) {
+): void {
   try {
     selection.update((state) => {
       // Only update if we still have the same selection
@@ -166,17 +170,17 @@ export function updateExportedImage(
       };
     });
   } catch (error) {
-    console.error("Failed to update exported image:", error);
+    console.error('Failed to update exported image:', error);
     selection.update((state) => ({
       ...state,
       isLoading: false,
       error:
-        "Failed to process image. Please try again with a different selection.",
+        'Failed to process image. Please try again with a different selection.',
     }));
   }
 }
 
-export function setUploadingFill(isUploading: boolean) {
+export function setUploadingFill(isUploading: boolean): void {
   selection.update((state) => {
     // Only update if we still have a selection
     if (!state.name || !state.fills) {
@@ -189,7 +193,7 @@ export function setUploadingFill(isUploading: boolean) {
   });
 }
 
-export function setLoading(isLoading: boolean) {
+export function setLoading(isLoading: boolean): void {
   selection.update((state) => {
     // If setting to false and we don't have a selection, reset to initial state
     if (!isLoading && (!state.name || !state.fills)) {

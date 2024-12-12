@@ -1,8 +1,8 @@
-import { writable } from "svelte/store";
+import { writable } from 'svelte/store';
 
 // Get initial theme from URL
 const url = new URL(window.location.href);
-const initialTheme = url.searchParams.get("theme") || "";
+const initialTheme = url.searchParams.get('theme') || '';
 
 export const theme = writable(initialTheme);
 

@@ -1,6 +1,6 @@
 // Simple utility functions for URL management
 export function createImageUrl(imageData: number[]): string {
-  const blob = new Blob([new Uint8Array(imageData)], { type: "image/png" });
+  const blob = new Blob([new Uint8Array(imageData)], { type: 'image/png' });
   return URL.createObjectURL(blob);
 }
 

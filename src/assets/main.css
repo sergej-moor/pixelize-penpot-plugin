@@ -1,12 +1,12 @@
-@import "./penpot.css";
-@import "./range-input.css";
+@import './penpot.css';
+@import './range-input.css';
 
 @tailwind components;
 @tailwind utilities;
 
 @font-face {
-  font-family: "GamjaFlower";
-  src: url("/public/GamjaFlower-Regular.ttf");
+  font-family: 'GamjaFlower';
+  src: url('/public/GamjaFlower-Regular.ttf');
 }
 
 :root {
@@ -35,12 +35,12 @@ body {
 }
 
 /* Theme */
-main[data-theme="light"] {
+main[data-theme='light'] {
   --background-color: var(--lb-primary);
   --text-color: var(--lf-primary);
 }
 
-main[data-theme="dark"] {
+main[data-theme='dark'] {
   --background-color: var(--db-primary);
   --text-color: var(--df-primary);
 }
