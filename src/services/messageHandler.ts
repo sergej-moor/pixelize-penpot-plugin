@@ -52,8 +52,7 @@ export class MessageHandler {
           setLoading(false);
           selection.update((state: SelectionState) => ({
             ...state,
-            error:
-              'Export failed. The image might be too large or in a unsupported file format.',
+            error: 'Unable to export image. Please try again.',
           }));
           break;
 
