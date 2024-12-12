@@ -15,7 +15,7 @@
 
 <main data-theme={$theme}>
   <h2
-    class=" text-center mb-2 font-GamjaFlower tracking-widest hover:tracking-[0.5rem] transition-all duration-700 font-bold"
+    class=" text-center mb-2 font-GamjaFlower tracking-widest hover:tracking-[0.7rem] transition-all duration-700 font-bold"
   >
     Pixelize!
   </h2>

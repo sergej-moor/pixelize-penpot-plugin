@@ -9,5 +9,5 @@ export const LOADING_MESSAGES = {
   PIXELIZING: 'Pixelizing image...',
   UPLOADING: 'Uploading fill...',
   INITIAL: 'Exporting as an image:',
-  NO_SELECTION: 'Select something to begin',
+  NO_SELECTION: 'Select something to start',
 } as const;

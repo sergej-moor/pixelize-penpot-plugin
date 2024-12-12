@@ -3,24 +3,20 @@ interface TooltipParams {
   position?: 'top' | 'bottom' | 'left' | 'right';
   maxWidth?: string;
   textClass?: string;
-  paddingClass?: string;
-  background?: string;
 }
 
 export const tooltip = (
   node: HTMLElement,
   param: TooltipParams
 ): { update: (params: TooltipParams) => void; destroy: () => void } => {
-  let alreadyLeft: boolean;
+  let updatedText: string;
   const { text, textClass } = param;
   let { position = 'top', maxWidth = 'max-w-xs' } = param;
-  let updatedText: string;
 
   function handleMouseEnter(event: Event): void {
     if (!(event.target instanceof HTMLElement)) return;
     event.stopPropagation();
-    alreadyLeft = false;
-    const existingTooltip = event.target.querySelector('.js-tooltip');
+    const existingTooltip = document.querySelector('.js-tooltip');
     if (existingTooltip) existingTooltip.remove();
     render(event.target as HTMLElement);
   }
@@ -74,26 +70,24 @@ export const tooltip = (
     let top = 0;
     let left = 0;
 
+    span.style.transform = 'scale(0.95)';
+
     switch (position) {
       case 'top':
         top = targetRect.top - tooltipRect.height - 8;
         left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-        span.style.transform = 'scale(0.95)';
         break;
       case 'bottom':
         top = targetRect.bottom + 8;
         left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-        span.style.transform = 'scale(0.95)';
         break;
       case 'left':
         top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
         left = targetRect.left - tooltipRect.width - 8;
-        span.style.transform = 'scale(0.95)';
         break;
       case 'right':
         top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
         left = targetRect.right + 8;
-        span.style.transform = 'scale(0.95)';
         break;
     }
 
@@ -117,13 +111,11 @@ export const tooltip = (
     if (!(event.target instanceof HTMLElement)) return;
     const tooltip = document.querySelector('.js-tooltip');
     if (tooltip instanceof HTMLElement) {
-      tooltip.classList.add('opacity-0');
+      tooltip.classList.add('opacity-0', 'invisible');
       tooltip.classList.remove('visible');
-      tooltip.classList.add('invisible');
       tooltip.style.transform = 'scale(0.95)';
     }
 
-    alreadyLeft = true;
     setTimeout(() => {
       const tooltip = document.querySelector('.js-tooltip');
       if (tooltip) tooltip.remove();
@@ -143,13 +135,13 @@ export const tooltip = (
       if (newPosition) position = newPosition;
       if (newMaxWidth) maxWidth = newMaxWidth;
 
-      const tooltip = node.querySelector('.js-tooltip-content');
+      const tooltip = document.querySelector('.js-tooltip-content');
       if (
         tooltip instanceof HTMLElement &&
         text &&
-        tooltip.innerText !== text
+        tooltip.textContent !== text
       ) {
-        tooltip.innerText = text;
+        tooltip.textContent = text;
       }
     },
     destroy(): void {

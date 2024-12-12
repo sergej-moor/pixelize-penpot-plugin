@@ -3,9 +3,8 @@
   import { selection } from '../stores/selection';
   import { LOADING_MESSAGES } from '../constants';
   import { createImageUrl, revokeImageUrl } from '../utils/imageUrl';
-  import Spinner from './Spinner.svelte';
+  import LoadingSpinner from './LoadingSpinner.svelte';
 
-  // URL management
   let previewUrl: string | undefined;
 
   $: {
@@ -56,7 +55,7 @@
           <div
             class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded transition-all duration-200"
           >
-            <Spinner />
+            <LoadingSpinner />
             <p class="text-sm text-white font-medium">{loadingMessage}</p>
           </div>
         {/if}
@@ -66,7 +65,7 @@
       <div class="flex items-center justify-center w-full h-full">
         <div class="text-sm text-center">
           {#if $selection.name}
-            <Spinner />
+            <LoadingSpinner />
             {LOADING_MESSAGES.INITIAL}
             <p>{displayName}</p>
           {:else}
