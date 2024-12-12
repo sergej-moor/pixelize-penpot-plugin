@@ -24,13 +24,10 @@ export function updateSelection(shapes: any) {
     return;
   }
 
-  // Generate a new ID for this selection
-  const newId = shapes.id || Math.random().toString(36).substring(2);
-
-  // Reset all image and processing states, but keep the new selection info
+  // Use Penpot's ID directly
   selection.update(() => ({
     ...initialState,
-    id: newId,
+    id: shapes.id,
     name: shapes.name,
     fills: shapes.fills,
     // Clear all image data

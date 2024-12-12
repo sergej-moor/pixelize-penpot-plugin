@@ -154,11 +154,9 @@ async function handleSelectionChange(): Promise<void> {
 
   try {
     sendMessage({ type: "selection-loading", isLoading: true });
-    const selectionId = generateSelectionId();
 
-    // Send initial selection data
     const selectionState: SelectionState = {
-      id: selectionId,
+      id: selection.id,
       name: selection.name,
       fills: selection.fills,
       isLoading: true,
@@ -177,7 +175,7 @@ async function handleSelectionChange(): Promise<void> {
         imageData: new Uint8Array(imageData),
         width: selection.width,
         height: selection.height,
-        selectionId,
+        selectionId: selection.id,
       });
     }
   } catch (error) {
@@ -208,10 +206,6 @@ async function handlePluginMessage(message: PluginMessage): Promise<void> {
 }
 
 // Helper functions
-function generateSelectionId(): string {
-  return Math.random().toString(36).substring(2);
-}
-
 function sendMessage(message: PluginMessage): void {
   penpot.ui.sendMessage(message);
 }
