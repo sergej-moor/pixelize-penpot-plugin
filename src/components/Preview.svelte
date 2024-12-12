@@ -34,7 +34,7 @@
   }
 </script>
 
-<h3 class="font-bold text-sm">Selection: {displayName}</h3>
+
 
 <div class="rounded-lg border border-gray-200 dark:border-gray-700">
   <div class="relative w-[300px] h-[300px] min-h-[100px]">
@@ -63,14 +63,16 @@
     {:else}
       <!-- Initial State -->
       <div class="flex items-center justify-center w-full h-full">
-        <p class="text-sm">
+        <div class="text-sm text-center">
           {#if $selection.name}
             <Spinner />
             {LOADING_MESSAGES.INITIAL}
+          <p>{displayName}</p>
+
           {:else}
             {LOADING_MESSAGES.NO_SELECTION}
           {/if}
-        </p>
+        </div>
       </div>
     {/if}
   </div>

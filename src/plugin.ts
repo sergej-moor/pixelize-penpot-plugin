@@ -3,9 +3,9 @@ import type { Fill, ImageData as PenpotImageData } from "@penpot/plugin-types";
 
 // Configuration
 const PLUGIN_CONFIG = {
-  name: "Pixelize",
+  name: "Pixelize!",
   width: 340,
-  height: 662,
+  height: 622,
 } as const;
 
 // Types

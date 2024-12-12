@@ -1,6 +1,6 @@
 {
-  "name": "Plugin Template",
-  "description": "A template for Penpot plugins",
+  "name": "Pixelize!",
+  "description": "Pixelize your images",
   "code": "/plugin.js",
   "icon": "/icon.png",
   "permissions": [
