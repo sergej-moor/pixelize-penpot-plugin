@@ -1,6 +1,7 @@
 <script lang="ts">
   import { selection, pixelateImage, updatePreview } from '../stores/selection';
   import { CONSTANTS } from '../constants';
+  import { tooltip } from '../actions/tooltip';
 
   let currentValue = $selection.pixelSize;
   let displayValue = currentValue;
@@ -70,8 +71,15 @@
 </script>
 
 <div class="flex flex-col gap-4">
-  <div class="checkbox-container flex items-center justify-end gap-2">
-    <label for="realtimePreview" class="text-sm">
+  <div class="checkbox-container flex items-center justify-end gap-2" >
+        <div use:tooltip={{text: "Automatically apply changes while adjusting pixel size", 
+        position: "left",
+              maxWidth: "max-w-[200px]"}}>
+    <label 
+      for="realtimePreview" 
+      class="text-sm"
+      
+    >
       Realtime
     </label>
     <input
@@ -80,11 +88,18 @@
       bind:checked={realtimePreview}
       disabled={isDisabled || isProcessing}
       class="checkbox-input"
+  
     />
+  </div>
   </div>
 
   <label class="slider-row">
-    <span class="body-s">Pixel Size:</span>
+    <span 
+      class="body-s"
+      use:tooltip={{text: "Adjust the size of pixels in the effect",maxWidth: "max-w-[200px]",position:"right"}}
+    >
+      Pixel Size:
+    </span>
     <div class="flex items-center gap-2">
       <div class="relative flex-1">
         <input 
@@ -109,14 +124,21 @@
       disabled={shouldDisableApply}
       class:opacity-50={realtimePreview}
       class="flex-1 flex justify-center gap-2 items-center"
+      use:tooltip={{
+        text: "Apply a pixelated fill layer to the current shape",
+        position: "top",
+        maxWidth: "max-w-[300px]"
+      }}
     >
       {realtimePreview ? 'Auto-applying changes' : 'Apply to shape'}
     </button>
+    
     <button 
       on:click={handleAddNewLayer}
       disabled={isDisabled || isProcessing}
       data-appearance="primary"
-      class="flex-1 flex justify-center gap-2 items-center"
+      class="flex-1 flex justify-center gap-2 items-center 	"
+      use:tooltip={{text: "Create a new shape with the pixelation effect",position:"bottom", maxWidth: "max-w-[300px]"}}
     >
       Create new Shape
     </button>

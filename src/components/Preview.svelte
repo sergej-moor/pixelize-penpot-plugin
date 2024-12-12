@@ -4,6 +4,7 @@
   import { LOADING_MESSAGES } from '../constants';
   import { createImageUrl, revokeImageUrl } from '../utils/imageUrl';
   import Spinner from './Spinner.svelte';
+  import { tooltip } from '../actions/tooltip';
 
   // URL management
   let previewUrl: string | undefined;
@@ -36,7 +37,10 @@
 
 
 
-<div class="rounded-lg border border-gray-200 dark:border-gray-700">
+<div 
+  class="rounded-lg border border-gray-200 dark:border-gray-700"
+ 
+>
   <div class="relative w-[300px] h-[300px] min-h-[100px]">
     {#if $selection.error}
       <div class="flex items-center justify-center h-full p-4">
@@ -67,8 +71,7 @@
           {#if $selection.name}
             <Spinner />
             {LOADING_MESSAGES.INITIAL}
-          <p>{displayName}</p>
-
+            <p>{displayName}</p>
           {:else}
             {LOADING_MESSAGES.NO_SELECTION}
           {/if}
