@@ -1,3 +1,4 @@
+import type { Fill } from '@penpot/plugin-types';
 import type { PluginMessage } from '../types';
 import { updateTheme } from '../stores/theme';
 import {
@@ -23,7 +24,7 @@ export class MessageHandler {
           const selectionData = message.content && {
             id: message.content.id,
             name: message.content.name,
-            fills: message.content.fills as unknown[],
+            fills: message.content.fills as Fill[] | 'mixed',
           };
           updateSelection(selectionData);
           break;

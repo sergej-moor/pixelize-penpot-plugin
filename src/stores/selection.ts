@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import type { Fill } from '@penpot/plugin-types';
 import { processImage } from '../utils/imageProcessing';
 import type { SelectionState } from '../types';
 
@@ -17,7 +18,7 @@ const initialState: SelectionState = {
 export const selection = writable<SelectionState>(initialState);
 
 export function updateSelection(
-  shapes: { id: string; name: string; fills: unknown[] } | null
+  shapes: { id: string; name: string; fills: Fill[] | 'mixed' } | null
 ): void {
   // If no shapes or shapes is null, reset to initial state
   if (!shapes) {
