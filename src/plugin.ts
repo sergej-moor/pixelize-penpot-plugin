@@ -1,4 +1,8 @@
-import type { PluginMessage, ImageData, SelectionState } from "./types";
+import type {
+  PixelatedShapeConfig,
+  NewLayerConfig,
+  PluginMessage,
+} from "./types";
 import type { Fill, ImageData as PenpotImageData } from "@penpot/plugin-types";
 
 // Configuration
@@ -7,20 +11,6 @@ const PLUGIN_CONFIG = {
   width: 340,
   height: 622,
 } as const;
-
-// Types
-interface PixelatedShapeConfig {
-  width: number;
-  height: number;
-  imageFill: Fill & { type: "image" };
-}
-
-interface NewLayerConfig {
-  imageData: Uint8Array;
-  width: number;
-  height: number;
-  originalFill: Fill;
-}
 
 // Plugin initialization
 function initializePlugin(): void {

@@ -1,11 +1,27 @@
 import type { Fill, ImageData as PenpotImageData } from "@penpot/plugin-types";
 
+// Data Types
 export interface ImageData {
   data: Uint8Array;
   width: number;
   height: number;
 }
 
+// Plugin Configuration Types
+export interface PixelatedShapeConfig {
+  width: number;
+  height: number;
+  imageFill: Fill & { type: "image" };
+}
+
+export interface NewLayerConfig {
+  imageData: Uint8Array;
+  width: number;
+  height: number;
+  originalFill: Fill;
+}
+
+// State Types
 export interface SelectionState {
   id: string;
   name: string;
@@ -33,6 +49,7 @@ export interface SelectionState {
   };
 }
 
+// Message Types
 export type PluginMessage =
   | { type: "theme"; content: string }
   | { type: "selection"; content: SelectionState | null }
