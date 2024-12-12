@@ -2,6 +2,7 @@ import type {
   PixelatedShapeConfig,
   NewLayerConfig,
   PluginMessage,
+  SelectionState,
 } from "./types";
 import type { Fill, ImageData as PenpotImageData } from "@penpot/plugin-types";
 
@@ -41,6 +42,10 @@ async function uploadImage(imageData: Uint8Array): Promise<PenpotImageData> {
     return uploadedImage;
   } catch (error) {
     console.error("Error uploading image:", error);
+    sendMessage({
+      type: "export-error",
+      error: "Failed to upload image. The file might be too large.",
+    });
     throw error;
   }
 }
@@ -78,6 +83,10 @@ async function addNewPixelatedLayer(data: NewLayerConfig): Promise<void> {
     sendMessage({ type: "fill-upload-complete" });
   } catch (error) {
     console.error("Error creating new layer:", error);
+    sendMessage({
+      type: "export-error",
+      error: "Failed to create new layer. Please try again.",
+    });
   } finally {
     penpot.history.undoBlockFinish(blockId);
   }
@@ -118,7 +127,7 @@ function deleteTopLayer(selection: any): void {
     penpot.history.undoBlockFinish(blockId);
   }
 }
-
+/* 
 function clearAllExceptLast(selection: any): void {
   if (!Array.isArray(selection.fills) || selection.fills.length <= 1) return;
 
@@ -129,7 +138,7 @@ function clearAllExceptLast(selection: any): void {
   } finally {
     penpot.history.undoBlockFinish(blockId);
   }
-}
+} */
 
 // Event handlers
 function handleThemeChange(theme: string): void {
@@ -173,6 +182,10 @@ async function handleSelectionChange(): Promise<void> {
     }
   } catch (error) {
     console.error("Error handling selection change:", error);
+    sendMessage({
+      type: "export-error",
+      error: "Failed to process selection. The image might be too complex.",
+    });
   } finally {
     sendMessage({ type: "selection-loading", isLoading: false });
   }
